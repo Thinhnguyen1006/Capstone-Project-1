@@ -6,6 +6,7 @@ module ALU (
 );
 // Siganl for Logic Combination Block
 logic a, o, x;
+logic [2:0] aox;
 // Signal for sel[1:0] of mux ALUResult
 logic [1:0] sel;
 // Signal la[1:0] of Barrel shifter
