@@ -57,7 +57,10 @@ parameter GES_GE = 3'b100;
    end
 
    initial begin	
-	logic [33:0] temp0, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, temp9, temp10, temp11, temp12, temp13, temp14, temp15, temp16, temp17, temp18, temp19, temp20, temp21, temp22, temp23, temp24, temp25, temp26, temp27, temp28, temp29, temp30, temp31, temp32, temp33, temp34, temp35, temp36;
+	logic [33:0] temp0, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, temp9, temp10, temp11, temp12, temp13, temp14, temp15, temp16, temp17, temp18, temp19, temp20, temp21, temp22, temp23, temp24, temp25, temp26, temp27, temp28, temp29, temp30;
+	logic [33:0] temp31, temp32, temp33, temp34, temp35, temp36;
+	logic [33:0] temp37, temp38, temp39, temp40, temp41, temp42;
+	logic [33:0] temp43, temp44, temp45, temp46, temp47, temp48;
 	
 	// Test cases for 37 instructions with GES = 3'b001
 	// LB
@@ -121,8 +124,56 @@ parameter GES_GE = 3'b100;
 	temp28 = {7'b011_0111, 3'b000, 1'b0, GES_LT, 4'b0000, 1'b0, 3'b100, 2'b11, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b1};
 	// JALR
 	temp29 = {7'b110_1111, 3'b000, 1'b0, GES_LT, 4'b0000, 1'b0, 3'b011, 2'b10, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b1};
+	// JAL
+	temp30 = {7'b110_1111, 3'b000, 1'b0, GES_LT, 4'b0000, 1'b0, 3'b011, 2'b10, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b1};
+
+	// ************* Branch Instructions with GES = 001 **************
+	// BEQ
+	temp31 = {7'b110_0011, 3'b000, 1'b0, GES_LT, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BNE
+	temp32 = {7'b110_0011, 3'b001, 1'b0, GES_LT, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BLT
+	temp33 = {7'b110_0011, 3'b100, 1'b0, GES_LT, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BGE
+	temp34 = {7'b110_0011, 3'b101, 1'b0, GES_LT, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BLTU
+	temp35 = {7'b110_0011, 3'b110, 1'b0, GES_LT, 4'b1000, 1'b0, 3'b010, 2'b00, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BGEU
+	temp36 = {7'b110_0011, 3'b111, 1'b0, GES_LT, 4'b1000, 1'b0, 3'b010, 2'b00, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+
+	// ************* Branch Instructions with GES = 010 **************
+	// BEQ
+	temp37 = {7'b110_0011, 3'b000, 1'b0, GES_EQ, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BNE
+	temp38 = {7'b110_0011, 3'b001, 1'b0, GES_EQ, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BLT
+	temp39 = {7'b110_0011, 3'b100, 1'b0, GES_EQ, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BGE
+	temp40 = {7'b110_0011, 3'b101, 1'b0, GES_EQ, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BLTU
+	temp41 = {7'b110_0011, 3'b110, 1'b0, GES_EQ, 4'b1000, 1'b0, 3'b010, 2'b00, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BGEU
+	temp42 = {7'b110_0011, 3'b111, 1'b0, GES_EQ, 4'b1000, 1'b0, 3'b010, 2'b00, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+
+	// ************* Branch Instructions with GES = 100 **************
+	// BEQ
+	temp43 = {7'b110_0011, 3'b000, 1'b0, GES_GE, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BNE
+	temp44 = {7'b110_0011, 3'b001, 1'b0, GES_GE, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BLT
+	temp45 = {7'b110_0011, 3'b100, 1'b0, GES_GE, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BGE
+	temp46 = {7'b110_0011, 3'b101, 1'b0, GES_GE, 4'b1001, 1'b0, 3'b010, 2'b00, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BLTU
+	temp47 = {7'b110_0011, 3'b110, 1'b0, GES_GE, 4'b1000, 1'b0, 3'b010, 2'b00, 1'b0, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+	// BGEU
+	temp48 = {7'b110_0011, 3'b111, 1'b0, GES_GE, 4'b1000, 1'b0, 3'b010, 2'b00, 1'b1, 1'b0, 1'b0, 2'b00, 1'b0, 2'b00, 1'b0, 1'b0};
+
+
+
 
 	// Instance task chk_ins
+	$display("======================================== Check Instructions without Branch Instruction ======================================== ");
 	chk_inst (temp0);
 	chk_inst (temp1);
 	chk_inst (temp2);
@@ -153,6 +204,32 @@ parameter GES_GE = 3'b100;
 	chk_inst (temp27);
 	chk_inst (temp28);
 	chk_inst (temp29);
+	chk_inst (temp30);
+	$display("======================================== Check Branch Instruction with GES = 001 ======================================== ");
+	chk_inst (temp31);
+	chk_inst (temp32);
+	chk_inst (temp33);
+	chk_inst (temp34);
+	chk_inst (temp35);
+	chk_inst (temp36);
+
+	$display("======================================== Check Branch Instruction with GES = 010 ======================================== ");
+	chk_inst (temp37);
+	chk_inst (temp38);
+	chk_inst (temp39);
+	chk_inst (temp40);
+	chk_inst (temp41);
+	chk_inst (temp42);
+
+	$display("======================================== Check Branch Instruction with GES = 100 ======================================== ");
+	chk_inst (temp43);
+	chk_inst (temp44);
+	chk_inst (temp45);
+	chk_inst (temp46);
+	chk_inst (temp47);
+	chk_inst (temp48);
+	$finish;
+
 end
 
 task chk_inst (
@@ -180,7 +257,7 @@ task chk_inst (
 		funct3 			= in_temp[26:24];
 		funct7_5 		= in_temp[23];
 		GES 			= in_temp[22:20];
-
+		#10;
 		// Seperate signal
 		instr_code 		= in_temp[33:20];
 		expect_ALU_Control 	= in_temp[19:16];
@@ -204,6 +281,9 @@ task chk_inst (
 		    (Ext_Data_Src == expect_Ext_Data_Src) && (Ext_rs2_Src == expect_Ext_rs2_Src) && (MemWrite == expect_MemWrite) &&
 		    (RegWrite == expect_RegWrite)) begin
 		    	$display("---------- PASS ----------");
+			$display("Op: %b | funct3: %b | funct7_5: %b | GES: %b", in_temp[33:27], in_temp[26:24], in_temp[23], in_temp[22:20]);
+			$display("----------------------------------------------------------------------------------");
+
 		end else begin
 			$display("-------------------------------------- FAIL --------------------------------------");
 			$display("Op: %b | funct3: %b | funct7_5: %b | GES: %b", in_temp[33:27], in_temp[26:24], in_temp[23], in_temp[22:20]);
