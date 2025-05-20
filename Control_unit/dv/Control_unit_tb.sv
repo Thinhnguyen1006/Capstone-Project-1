@@ -2,7 +2,7 @@
 module Control_unit_tb;
 // Parameter
 parameter GES_LT = 3'b001;
-parameter GES_EQ = 4'b010;
+parameter GES_EQ = 3'b010;
 parameter GES_GE = 3'b100;
 
    logic [6:0] op;
