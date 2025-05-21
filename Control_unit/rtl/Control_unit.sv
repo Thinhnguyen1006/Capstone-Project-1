@@ -136,10 +136,7 @@ assign ImmSrc[0] = ((~temp[10]) & temp[9] & (~temp[8]) & (~temp[7]) & (~temp[6])
 						 ((~temp[10]) & (~temp[9]) & temp[8] & (~temp[7]) & (~temp[6]) & temp[5] & temp[4] & (~temp[3]) & (~temp[2]) & temp[1] & (~temp[0])) |
 						 ((~temp[10]) & (~temp[9]) & temp[8] & (~temp[7]) & (~temp[6]) & temp[5] & temp[4] & temp[3] & (~temp[2]) & temp[1]);
 					 
-assign ImmSrc[1] = ((~temp[10]) & (~temp[9]) & (~temp[8]) & (~temp[7]) & (~temp[6]) & temp[5] & temp[4] & (~temp[3]) & (~temp[2])) |
-						 ((~temp[10]) & (~temp[9]) & (~temp[8]) & (~temp[7]) & (~temp[6]) & temp[5] & temp[4] & (~temp[3]) & temp[2] & (~temp[1])) |
-						 ((~temp[10]) & (~temp[9]) & (~temp[8]) & (~temp[7]) & (~temp[6]) & temp[5] & temp[4] & temp[3] & (~temp[2])) |
-						 (temp[10] & temp[9] & (~temp[8]) & (~temp[7]) & (~temp[6]) & temp[5] & temp[4] & (~temp[3]) & (~temp[2])) |
+assign ImmSrc[1] = (temp[10] & temp[9] & (~temp[8]) & (~temp[7]) & (~temp[6]) & temp[5] & temp[4] & (~temp[3]) & (~temp[2])) |
 						 (temp[10] & temp[9] & (~temp[8]) & (~temp[7]) & (~temp[6]) & temp[5] & temp[4] & temp[3] & (~temp[2])) |
 						 (temp[10] & temp[9] & (~temp[8]) & (~temp[7]) & (~temp[6]) & temp[5] & temp[4] & temp[3] & temp[2]) |
 						 (temp[10] & temp[9] & (~temp[8]) & temp[7] & temp[6] & temp[5] & temp[4]);
