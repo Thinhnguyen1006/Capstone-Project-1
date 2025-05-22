@@ -17,7 +17,13 @@ module top (
 	output logic [31:0] Instruction,
 	output logic [31:0] Mem_Result,
 	output logic [31:0] WD_temp, WD3_temp,
-	output logic [31:0] ALU_result
+	output logic [31:0] ALU_result,
+	
+	//
+	output logic [31:0] Final_Addr_DataMem,
+	input logic SW_Src,
+	input logic [7:0] io,
+	output logic [31:0] out_read
 	);
 
 // Signals of Control_unit
@@ -50,6 +56,10 @@ logic [31:0] WD, ALUResult;
 //logic [31:0] Mem_Result;
 logic [31:0] Result_Data, Extended_Data, Final_Data;
 
+// Signals for add_io
+logic [31:0] final_add_datamem;
+logic sw_src;
+logic [31:0] io_temp;
 
 // Instance moduel Control Unit
 Control_unit	CU 			(.op(Instr[6:0]), .funct3(Instr[14:12]), .funct7_5(Instr[30]), .GES(GES),
@@ -77,7 +87,7 @@ mux2_1	rd2_mux				(.in0(RD2), .in1(Extended_Imm), .sel(ALUSrc), .out(Src2));
 extend_rs2	ExtendRS2		(.rd2(RD2), .Ext_rs2_Src(Ext_rs2_Src), .out(WD));
 
 // Insatances module relate to Data Memory
-DataMem	DataMemory			(.clk(clk), .WE(MemWrite), .A(ALUResult), .WD(WD), .RD(Mem_Result));
+DataMem	DataMemory			(.clk(clk), .WE(MemWrite), .A(final_add_datamem), .WD(WD), .RD(Mem_Result));
 
 // Instance module ALU
 ALU	ALU_Unit					(.Arg1(Src1), .Arg2(Src2), .ALU_Control(ALU_Control), .GES(GES), .ALUResult(ALUResult));
@@ -89,7 +99,9 @@ mux2_1	final_data_mux		(.in0(Result_Data), .in1(Extended_Data), .sel(Ext_Data_Sr
 mux2_1	wd3_mux				(.in0(Final_Data), .in1(PC_Target), .sel(AUIPC_Src), .out(WD3));
 
 
-
+// Instance mux2_1 for selecting ADDRESS of Data Memory
+mux2_1	add_io				(.in0(ALUResult), .in1(io_temp), .sel(SW_Src), .out(final_add_datamem));
+dff_32	read_mem				(.clk(clk), .rst_n(rst_n), .en(SW_Src), .d(Mem_Result), .q(out_read));
 
 // Assignment outputs
 //assign RD = Mem_Result;
@@ -111,4 +123,24 @@ assign WD_temp = WD;
 assign WD3_temp = WD3;
 assign ALU_result = ALUResult;
 
+assign Final_Addr_DataMem = final_add_datamem;
+assign io_temp = {24'h00_0000, io[7:0]};
+
 endmodule : top
+
+module dff_32 (
+	input logic clk, rst_n, en,
+	input logic [31:0] d,
+	output logic [31:0] q
+);
+
+always_ff @(posedge clk or negedge rst_n) begin
+	if (~rst_n)
+		q <= 32'h0;
+	else if (en)
+		q <= d;
+	else
+		q <= q;
+end
+
+endmodule : dff_32
