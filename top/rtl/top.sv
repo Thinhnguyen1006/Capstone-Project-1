@@ -6,13 +6,18 @@ module top (
 	output logic [2:0] funct3,
 	output logic funct7_5,
 	output logic [2:0] GES,
+	output logic WE, WE3,
+	
 
 	// Check
 	output logic [31:0] srcA, srcB,
 	output logic [31:0] Result_data,
 	output logic [1:0] result_src,
 	output logic [31:0] Immdata,
-	output logic [31:0] Instruction
+	output logic [31:0] Instruction,
+	output logic [31:0] Mem_Result,
+	output logic [31:0] WD_temp, WD3_temp,
+	output logic [31:0] ALU_result
 	);
 
 // Signals of Control_unit
@@ -41,7 +46,8 @@ logic [31:0] PCNext, PC_JALR, PC, PC_plus4, PC_Target;
 logic [31:0] Instr, WD3, RD1, RD2;
 logic [31:0] Src1, Src2;
 logic [31:0] Extended_Imm;
-logic [31:0] WD, ALUResult, Mem_Result;
+logic [31:0] WD, ALUResult;
+//logic [31:0] Mem_Result;
 logic [31:0] Result_Data, Extended_Data, Final_Data;
 
 
@@ -56,7 +62,7 @@ Control_unit	CU 			(.op(Instr[6:0]), .funct3(Instr[14:12]), .funct7_5(Instr[30])
 mux2_1	PCNext_mux			(.in0(PC_plus4), .in1(PC_Target), .sel(PCSrc), .out(PCNext));
 mux2_1	PC_JALR_mux			(.in0(PCNext), .in1(ALUResult), .sel(JALR_Src), .out(PC_JALR));
 PC_ff		Program_Counter	(.clk(clk), .rst_n(rst_n), .d(PC_JALR), .q(PC));
-FA32		PC_plus4_fa			(.a(PC), .b(32'h0000_0001), .cin(1'b0), .s(PC_plus4));
+FA32		PC_plus4_fa			(.a(PC), .b(32'h0000_0004), .cin(1'b0), .s(PC_plus4));
 FA32		PC_target_fa		(.a(Extended_Imm), .b(PC), .cin(1'b0), .s(PC_Target));
 
 // Instance module Instruction Memory
@@ -99,5 +105,10 @@ assign Result_data = Result_Data;
 assign result_src = ResultSrc;
 assign Immdata = Extended_Imm;
 assign Instruction = Instr;
+assign WE = MemWrite;
+assign WE3 = RegWrite;
+assign WD_temp = WD;
+assign WD3_temp = WD3;
+assign ALU_result = ALUResult;
 
 endmodule : top
