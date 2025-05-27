@@ -16,13 +16,17 @@ module top (
 	output logic [31:0] Immdata,
 	output logic [31:0] Instruction,
 	output logic [31:0] Mem_Result,
-	output logic [31:0] WD_temp, WD3_temp,
+	output logic [31:0] WD_temp,
+	output logic [31:0] WD3_temp,
 	output logic [31:0] ALU_result,
+	output logic [31:0] io_val_ff,
 	
 	//
 	output logic [31:0] Final_Addr_DataMem,
-	input logic SW_Src,
-	input logic [7:0] io,
+	input logic [1:0] SW_Src,
+	input logic [7:0] io_val,
+	input logic in_en, // in_en = WE_IO
+	output logic WE_final,
 	output logic [31:0] out_read
 	);
 
@@ -36,6 +40,7 @@ logic [2:0] GES;
 */
 // Outputs 
 logic [1:0] Ext_rs2_Src;
+logic [31:0] Ext_rs2_Data;
 logic PCSrc;
 logic [1:0] ResultSrc;
 logic [1:0] Ext_Data_Val;
@@ -57,9 +62,13 @@ logic [31:0] WD, ALUResult;
 logic [31:0] Result_Data, Extended_Data, Final_Data;
 
 // Signals for add_io
-logic [31:0] final_add_datamem;
+logic [31:0] final_addr_datamem;
+logic [31:0] final_wd_datamem;
 logic sw_src;
-logic [31:0] io_temp;
+//logic WE_final;
+logic [31:0] addr_temp;
+logic [31:0] io_val_temp;
+logic [31:0] wd_temp;
 
 // Instance moduel Control Unit
 Control_unit	CU 			(.op(Instr[6:0]), .funct3(Instr[14:12]), .funct7_5(Instr[30]), .GES(GES),
@@ -84,10 +93,11 @@ Reg_file	reg_file				(.clk(clk), .rst_n(rst_n), .WE3(RegWrite), .A1(Instr[19:15]
 assign Src1 = RD1;
 extend_unit	ExtendUnit		(.in(Instr[31:7]), .ImmSrc(ImmSrc), .out(Extended_Imm));
 mux2_1	rd2_mux				(.in0(RD2), .in1(Extended_Imm), .sel(ALUSrc), .out(Src2));
-extend_rs2	ExtendRS2		(.rd2(RD2), .Ext_rs2_Src(Ext_rs2_Src), .out(WD));
+extend_rs2	ExtendRS2		(.rd2(RD2), .Ext_rs2_Src(Ext_rs2_Src), .out(Ext_rs2_Data));
 
 // Insatances module relate to Data Memory
-DataMem	DataMemory			(.clk(clk), .WE(MemWrite), .A(final_add_datamem), .WD(WD), .RD(Mem_Result));
+assign WE_final = MemWrite ^ in_en;
+DataMem	DataMemory			(.clk(clk), .WE(WE_final), .A(final_addr_datamem), .WD(final_wd_datamem), .RD(Mem_Result));
 
 // Instance module ALU
 ALU	ALU_Unit					(.Arg1(Src1), .Arg2(Src2), .ALU_Control(ALU_Control), .GES(GES), .ALUResult(ALUResult));
@@ -100,8 +110,13 @@ mux2_1	wd3_mux				(.in0(Final_Data), .in1(PC_Target), .sel(AUIPC_Src), .out(WD3)
 
 
 // Instance mux2_1 for selecting ADDRESS of Data Memory
-mux2_1	add_io				(.in0(ALUResult), .in1(io_temp), .sel(SW_Src), .out(final_add_datamem));
-dff_32	read_mem				(.clk(clk), .rst_n(rst_n), .en(SW_Src), .d(Mem_Result), .q(out_read));
+mux4_1	addr_mux				(.in0(ALUResult), .in1(32'h0000_0030), .in2(32'h0000_0040), .in3(32'h0), .sel(SW_Src), .out(final_addr_datamem));
+// Instance mux2-1 for selecting DATA from external or internal
+mux2_1	in_val_mux			(.in0(Ext_rs2_Data), .in1(io_val_temp), .sel(in_en), .out(final_wd_datamem));
+dff_32	wd_ff					(.clk(clk), .rst_n(1'b1), .en(in_en), .d(final_wd_datamem), .q(WD_temp[31:0]));
+// D Flip FLop for input and output
+dff_32	in_val				(.clk(clk), .rst_n(1'b1), .en(in_en), .d({24'h0, io_val[7:0]}), .q(io_val_temp));
+dff_32	read_mem				(.clk(clk), .rst_n(rst_n), .en(SW_Src[1] & (~SW_Src[0])), .d(Mem_Result), .q(out_read));
 
 // Assignment outputs
 //assign RD = Mem_Result;
@@ -119,16 +134,18 @@ assign Immdata = Extended_Imm;
 assign Instruction = Instr;
 assign WE = MemWrite;
 assign WE3 = RegWrite;
-assign WD_temp = WD;
+//assign WD_temp = final_wd_datamem;
 assign WD3_temp = WD3;
 assign ALU_result = ALUResult;
 
-assign Final_Addr_DataMem = final_add_datamem;
-assign io_temp = {24'h00_0000, io[7:0]};
+assign Final_Addr_DataMem = final_addr_datamem;
+assign io_val_ff = io_val_temp;
+//assign addr_temp = {24'h00_0000, 8'h40};
 
 endmodule : top
 
-module dff_32 (
+module dff_32
+(
 	input logic clk, rst_n, en,
 	input logic [31:0] d,
 	output logic [31:0] q
